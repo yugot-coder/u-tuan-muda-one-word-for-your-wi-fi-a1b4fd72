@@ -17,8 +17,16 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8", newline="") as f:
         f.write(WORD)
     # Read back and verify the exact bytes we meant to write.
+    # Explicit comparison (not a bare check that disappears under python -O):
+    # if the file on disk differs from WORD, fail loudly with a non-zero exit.
     with open(OUTPUT_PATH, "rb") as f:
-        assert f.read() == WORD.encode("utf-8"), "entry.txt mismatch"
+        actual_bytes = f.read()
+    expected_bytes = WORD.encode("utf-8")
+    if actual_bytes != expected_bytes:
+        raise SystemExit(
+            "entry.txt mismatch: read back "
+            f"{actual_bytes!r}, expected {expected_bytes!r} (word={WORD!r})"
+        )
 
 
 if __name__ == "__main__":
